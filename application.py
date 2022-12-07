@@ -5,68 +5,69 @@ from Database import Database
 
 db = Database()
 def populate_list(hostname=''):
-    for i in router_tree_view.get_children():
-        router_tree_view.delete(i)
-    for row in db.fetch(hostname):
-        router_tree_view.insert('', 'end', values=row)
+    for i in tree_view.get_children():
+        tree_view.delete(i)
+    hostname = "%"+hostname+"%"
+    for row in db.fetch(table = "hosts", attribute="hostname", searchTerm=hostname):
+        tree_view.insert('', 'end', values=row)
 
 
 def populate_list2(query='select * from routers'):
-    for i in router_tree_view.get_children():
-        router_tree_view.delete(i)
-    for row in db.fetch2(query):
-        router_tree_view.insert('', 'end', values=row)
+    for i in tree_view.get_children():
+        tree_view.delete(i)
+    for row in db.query(query):
+        tree_view.insert('', 'end', values=row)
 
 
-def add_router():
-    if brand_text.get() == '' or hostname_text.get() == '' or ram_text.get() == '' or flash_text.get() == '':
+def add_alert():
+    if brand_text.get() == '' or alertID_text.get() == '' or host_text.get() == '' or flash_text.get() == '':
         messagebox.showerror('Required Fields', 'Please include all fields')
         return
-    db.insert(hostname_text.get(), brand_text.get(),
-              ram_text.get(), flash_text.get())
+    db.insert(alertID_text.get(), brand_text.get(),
+              host_text.get(), flash_text.get())
     clear_text()
     populate_list()
 
 
-def select_router(event):
+def select_record(event):
     try:
         global selected_item
-        index = router_tree_view.selection()[0]
-        selected_item = router_tree_view.item(index)['values']
-        hostname_entry.delete(0, END)
-        hostname_entry.insert(END, selected_item[1])
-        brand_entry.delete(0, END)
-        brand_entry.insert(END, selected_item[2])
-        ram_entry.delete(0, END)
-        ram_entry.insert(END, selected_item[3])
+        index = tree_view.selection()[0]
+        selected_item = tree_view.item(index)['values']
+        alertID_entry.delete(0, END)
+        alertID_entry.insert(END, selected_item[1])
+        shortDesc_entry.delete(0, END)
+        shortDesc_entry.insert(END, selected_item[2])
+        host_entry.delete(0, END)
+        host_entry.insert(END, selected_item[3])
         flash_entry.delete(0, END)
         flash_entry.insert(END, selected_item[4])
     except IndexError:
         pass
 
 
-def remove_router():
+def remove_alert():
     db.remove(selected_item[0])
     clear_text()
     populate_list()
 
 
-def update_router():
-    db.update(selected_item[0], hostname_text.get(), brand_text.get(),
-              ram_text.get(), flash_text.get())
+def update_alert():
+    db.update(selected_item[0], alertID_text.get(), brand_text.get(),
+              host_text.get(), flash_text.get())
     populate_list()
 
 
 def clear_text():
-    brand_entry.delete(0, END)
-    hostname_entry.delete(0, END)
-    ram_entry.delete(0, END)
+    shortDesc_entry.delete(0, END)
+    alertID_entry.delete(0, END)
+    host_entry.delete(0, END)
     flash_entry.delete(0, END)
 
 
-def search_hostname():
-    hostname = hostname_search.get()
-    populate_list(hostname)
+def search_table():
+    tableName = table_search.get()
+    updateFrame(tableName)
 
 
 def execute_query():
@@ -77,12 +78,12 @@ def execute_query():
 app = Tk()
 frame_search = Frame(app)
 frame_search.grid(row=0, column=0)
-lbl_search = Label(frame_search, text="Search by hostname",
+lbl_search = Label(frame_search, text="Search table",
     font=('bold', 12), pady=20)
 lbl_search.grid(row=0, column=0, sticky=W)
-hostname_search = StringVar()
-hostname_search_entry = Entry(frame_search, textvariable=hostname_search)
-hostname_search_entry.grid(row=0, column=1)
+table_search = StringVar()
+table_search_entry = Entry(frame_search, textvariable=table_search)
+table_search_entry.grid(row=0, column=1)
 lbl_search = Label(frame_search, text="Search by Query",
     font=('bold', 12), pady=20)
 lbl_search.grid(row=1, column=0, sticky=W)
@@ -95,23 +96,23 @@ query_search_entry.grid(row=1, column=1)
 frame_fields = Frame(app)
 frame_fields.grid(row=1, column=0)
 # hostname
-hostname_text = StringVar()
-hostname_label = Label(frame_fields, text='hostname', font=('bold', 12))
-hostname_label.grid(row=0, column=0, sticky=E)
-hostname_entry = Entry(frame_fields, textvariable=hostname_text)
-hostname_entry.grid(row=0, column=1, sticky=W)
+alertID_text = StringVar()
+alertID_label = Label(frame_fields, text='Alert ID', font=('bold', 12))
+alertID_label.grid(row=0, column=0, sticky=E)
+alertID_entry = Entry(frame_fields, textvariable=alertID_text)
+alertID_entry.grid(row=0, column=1, sticky=W)
 # BRAND
 brand_text = StringVar()
 brand_label = Label(frame_fields, text='Brand', font=('bold', 12))
 brand_label.grid(row=0, column=2, sticky=E)
-brand_entry = Entry(frame_fields, textvariable=brand_text)
-brand_entry.grid(row=0, column=3, sticky=W)
+shortDesc_entry = Entry(frame_fields, textvariable=brand_text)
+shortDesc_entry.grid(row=0, column=3, sticky=W)
 # RAM
-ram_text = StringVar()
+host_text = StringVar()
 ram_label = Label(frame_fields, text='RAM', font=('bold', 12))
 ram_label.grid(row=1, column=0, sticky=E)
-ram_entry = Entry(frame_fields, textvariable=ram_text)
-ram_entry.grid(row=1, column=1, sticky=W)
+host_entry = Entry(frame_fields, textvariable=host_text)
+host_entry.grid(row=1, column=1, sticky=W)
 # FLASH
 flash_text = StringVar()
 flash_label = Label(frame_fields, text='Flash', font=('bold', 12), pady=20)
@@ -120,35 +121,59 @@ flash_entry = Entry(frame_fields, textvariable=flash_text)
 flash_entry.grid(row=1, column=3, sticky=W)
 
 ## RESULTS ##
-frame_router = Frame(app)
-frame_router.grid(row=4, column=0, columnspan=4, rowspan=6, pady=20, padx=20)
+tree_view = None
+frame_results = None
+def resultsFrameBuild(columns=[]):
+    frame_results = Frame(app)
+    frame_results.grid(row=4, column=0, columnspan=4, rowspan=7, pady=20, padx=20)
 
-columns = ['Alert ID', 'Short Description', 'Hostname', 'Assigned', 'Severity']
-router_tree_view = Treeview(frame_router, columns=columns, show="headings")
-router_tree_view.column("Alert ID", width=30)
-for col in columns[1:]:
-    router_tree_view.column(col, width=120)
-    router_tree_view.heading(col, text=col)
-router_tree_view.bind('<<TreeviewSelect>>', select_router)
-router_tree_view.pack(side="left", fill="y")
-scrollbar = Scrollbar(frame_router, orient='vertical')
-scrollbar.configure(command=router_tree_view.yview)
-scrollbar.pack(side="right", fill="y")
-router_tree_view.config(yscrollcommand=scrollbar.set)
+    tree_view = Treeview(frame_results, columns=columns, show="headings")
+    for col in columns[:]:
+        tree_view.column(col, width=100)
+        tree_view.heading(col, text=col)
+    tree_view.bind('<<TreeviewSelect>>', select_record)
+    tree_view.pack(side=LEFT, fill="y")
+    Hscrollbar = Scrollbar(frame_results, orient='horizontal')
+    Hscrollbar.configure(command=tree_view.xview)
+    Hscrollbar.pack(side=BOTTOM, fill="x")
+    tree_view.config(xscrollcommand=Hscrollbar.set)
+    scrollbar = Scrollbar(frame_results, orient='vertical')
+    scrollbar.configure(command=tree_view.yview)
+    scrollbar.pack(side=RIGHT, fill="y")
+    tree_view.config(yscrollcommand=scrollbar.set)
+
+    
+    return tree_view, frame_results
+
+def updateFrame(table):
+    global tree_view
+    global frame_results
+    if(tree_view):
+        tree_view.grid_forget()
+        tree_view.destroy()
+        frame_results.grid_forget()
+        frame_results.destroy()
+    tableColumns = db.getColumns(table)
+    print(tableColumns)
+    tree_view, frame_results = resultsFrameBuild(columns=tableColumns)
+    return tree_view, frame_results
+
+
+tree_view, frame_results = updateFrame("alerts")
 
 ## BUTTONS ##
 frame_btns = Frame(app)
 frame_btns.grid(row=3, column=0)
 
-add_btn = Button(frame_btns, text='Add Router', width=12, command=add_router)
+add_btn = Button(frame_btns, text='Add Alert', width=12, command=add_alert)
 add_btn.grid(row=0, column=0, pady=20)
 
-remove_btn = Button(frame_btns, text='Remove Router',
-                    width=12, command=remove_router)
+remove_btn = Button(frame_btns, text='Remove Alert',
+                    width=12, command=remove_alert)
 remove_btn.grid(row=0, column=1)
 
-update_btn = Button(frame_btns, text='Update Router',
-                    width=12, command=update_router)
+update_btn = Button(frame_btns, text='Update Alert',
+                    width=12, command=update_alert)
 update_btn.grid(row=0, column=2)
 
 clear_btn = Button(frame_btns, text='Clear Input',
@@ -156,7 +181,7 @@ clear_btn = Button(frame_btns, text='Clear Input',
 clear_btn.grid(row=0, column=3)
 
 search_btn = Button(frame_search, text='Search',
-                    width=12, command=search_hostname)
+                    width=12, command=search_table)
 search_btn.grid(row=0, column=2)
 
 search_query_btn = Button(frame_search, text='Search Query',

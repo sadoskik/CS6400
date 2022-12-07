@@ -14,24 +14,23 @@ class Database:
             "CREATE TABLE IF NOT EXISTS routers (id INTEGER PRIMARY KEY, hostname text, brand text, ram integer, flash integer)")
         self.conn.commit()
 
-    def fetch(self, hostname=''):
+    def fetch(self, table='', searchTerm='', attribute=''):
         self.cur.execute(
-            "SELECT * FROM routers WHERE hostname LIKE ?", ('%'+hostname+'%',))
+            "SELECT * FROM "+table+" WHERE "+attribute+" LIKE %s", (searchTerm,))
         rows = self.cur.fetchall()
         return rows
-
-    def fetch2(self, query):
-        self.cur.execute(query)
+    def query(self, query="SELECT * FROM alerts"):
+        self.cur.execute(
+            query)
         rows = self.cur.fetchall()
         return rows
-
-    def insert(self, hostname, brand, ram, flash):
-        self.cur.execute("INSERT INTO routers VALUES (NULL, ?, ?, ?, ?)",
-                         (hostname, brand, ram, flash))
+    def insert(self, table='', values=[]):
+        self.cur.execute("INSERT INTO %s VALUES (%s)",
+                         (table, values))
         self.conn.commit()
 
-    def remove(self, id):
-        self.cur.execute("DELETE FROM routers WHERE id=?", (id,))
+    def remove(self, table, id):
+        self.cur.execute("DELETE FROM %s WHERE id=%s", (table, id))
         self.conn.commit()
 
     def update(self, id, hostname, brand, ram, flash):
@@ -41,3 +40,13 @@ class Database:
 
     def __del__(self):
         self.conn.close()
+    
+    def getColumns(self, table):
+        columnQuery = """
+        SELECT `COLUMN_NAME` 
+        FROM `INFORMATION_SCHEMA`.`COLUMNS` 
+        WHERE `TABLE_SCHEMA`='SIEM' 
+        AND `TABLE_NAME`=%s"""
+        self.cur.execute(columnQuery, (table,))
+        rows = self.cur.fetchall()
+        return rows

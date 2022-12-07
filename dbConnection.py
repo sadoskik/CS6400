@@ -56,29 +56,42 @@ def fillHosts():
         cursor.execute(insertCommand)
         connection.commit()
 def fillVuln():
-    insertCommand = """
-    INSERT INTO VULNs(idVULN,CVE,
-    description)
-    VALUES
-
-    """
+    
     vulnSkeleton = "({id}, '{CVE}', {description})"
     id = 1000
-    with open("cve.txt", "r") as fp:
+    with open("cve.txt", "r", encoding="utf-8") as fp:
         lines = fp.readlines()
         for line in lines:
+            insertCommand = """
+                INSERT INTO VULNs(idVULN,CVE,
+                description)
+                VALUES
+                (%s, %s, %s)
+                """
             CVE = line.split("\t")[0]
             description = line.split("\t")[1]
-            description.replace
-            insertCommand += vulnSkeleton.format(id=id, CVE=CVE, description=description)
-            insertCommand += ",\n"
+            #description = description.replace(":", "").replace("\"", "")
+            
             id += 1
-    insertCommand = insertCommand[:-2]
-    with connection.cursor() as cursor:
-        cursor.execute(insertCommand)
-        connection.commit()
+            with connection.cursor() as cursor:
+                cursor.execute(insertCommand, (id, CVE, description))
+                connection.commit()
+    
 
 def fillVIT():
     for id in range(100, 150):
-        pass
-fillVuln()
+        idHost = randint(2000,2999)
+        idVIT = id
+        timestamp = "2022-"+str(randint(1,12))+"-"+str(randint(1,28))+" "+ ":".join([str(randint(0,23)), str(randint(0,59)), str(randint(0,59))])
+        severity = randint(1,5)
+        idVULN = randint(1000,2000)
+        insertCommand = """
+                INSERT INTO VITs(idVIT,severity,
+                idVULN, timestamp, idhost)
+                VALUES
+                (%s, %s, %s, %s, %s)
+                """
+        with connection.cursor() as cursor:
+            cursor.execute(insertCommand, (idVIT, severity, idVULN, timestamp, idHost))
+            connection.commit()
+fillVIT()
