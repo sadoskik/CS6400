@@ -101,7 +101,6 @@ def update():
     updateInputs = {}
     updateLabels = {}
     row = 1
-    selectedItemIndex = 0
     for attribute in columnNames:
         updateInputs[attribute] = StringVar()
         
@@ -111,14 +110,34 @@ def update():
         updateEntries[attribute] = Entry(
             updateFrame, textvariable=updateInputs[attribute])
         if (selected_item):
-            updateEntries[attribute].insert(END, selected_item[selectedItemIndex])
-            selectedItemIndex += 1
+            updateEntries[attribute].insert(END, selected_item[attribute])
+           
 
         updateEntries[attribute].grid(row=row, column=2)
         row += 1
     submitButton = Button(updateFrame, text="Submit", command=submitUpdate)
     submitButton.grid(row=row, column=2)
     row += 1
+    return
+
+
+promptAnswer = None
+lock = False
+def promptSubmit():
+    global promptAnswer, lock
+    lock = False
+def requestInput(prompt:str)->str:
+    global promptAnswer, lock
+    promptWindow = Tk()
+    promptFrame = Frame(promptWindow)
+    promptFrame.grid(row=0, column=0, sticky=W)
+    promptLabel = Label(promptFrame, text=prompt)
+    promptLabel.grid(row=0, column=0)
+    promptAnswer = StringVar(promptFrame)
+    promptInput = Entry(promptFrame, textvariable=promptAnswer)
+    promptInput.grid(row=1, column=0)
+    promptButton = Button(promptFrame, text="Submit", command=promptSubmit)
+    promptButton.grid(row=1, column=1)
     return
 
 
@@ -133,13 +152,16 @@ def pivotSubmit():
     pivotValue = selected_item[selection]
     if "id" not in selection:
         return
-    pivotTable = selection[2:] + "s"
+    if selection == "id":
+        pivotTable = promptAnswer.get()
+    else:
+        pivotTable = selection[2:] + "s"
     print(selection, pivotValue, pivotTable)
     currentTable = pivotTable
-    updateFrame(currentTable, id=pivotValue)
+    refreshFrame(currentTable, id=pivotValue)
     pass
 def pivot():
-    global pivotWindow, pivotFrame
+    global pivotWindow, pivotFrame, promptAnswer
     pivotWindow = None
     pivotFrame = None
     pivotWindow = Tk()
@@ -159,6 +181,10 @@ def pivot():
             variable=radioSelection, value=attribute)
             pivotRadios[attribute].grid(row=row, column=0, sticky=W)
             row+=1
+    promptAnswer = StringVar(pivotFrame, value="Pivot Table")
+    pivotTableEntry = Entry(textvariable=promptAnswer)
+    pivotTableEntry.grid(row=row, column=0)
+    row+=1
     submitButton = Button(pivotFrame, text="Submit", command=pivotSubmit)
     submitButton.grid(row=row, column=0, sticky=W)
 
@@ -178,7 +204,7 @@ def select_record(event):
 
 
 def remove():
-    db.remove(currentTable, selected_item[0])
+    db.remove(currentTable, selected_item['id'])
     clear_text()
     populate_list()
 
@@ -197,7 +223,7 @@ def set_search_table():
     tableName = table_search.get()
     global currentTable
     currentTable = tableName
-    updateFrame(tableName)
+    refreshFrame(tableName)
 
 
 tree_view = None
@@ -275,7 +301,7 @@ def resultsFrameBuild(columns=[]):
     
     return tree_view, frame_results
 
-def updateFrame(table, id:int = None):
+def refreshFrame(table, id:int = None):
     global tree_view
     global frame_results
     if(tree_view):
@@ -290,7 +316,7 @@ def updateFrame(table, id:int = None):
     return tree_view, frame_results
 
 
-tree_view, frame_results = updateFrame(currentTable)
+tree_view, frame_results = refreshFrame(currentTable)
 
 ## BUTTONS ##
 frame_btns = Frame(app)

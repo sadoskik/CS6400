@@ -18,8 +18,8 @@ except Error as e:
 
 def fillHosts():
     insertCommand = """
-    INSERT INTO hosts(idhosts,hostname,hardware_laptop,
-    hardware_corecount,software_os,software_virtualized)
+    INSERT INTO hosts(id,hostname,hardware_laptop,
+    hardware_corecount,software_os,software_virtualized, iddepartment)
     VALUES
 
     """
@@ -36,8 +36,8 @@ def fillHosts():
         "Debian",
         "Arch",
         "CentOS"]
-    hostSkeleton = "({idhost}, '{hostname}', {hardLap}, {hardCore}, '{softOS}', {softVirt})"
-    for id in range(2050, 4000):
+    hostSkeleton = "({idhost}, '{hostname}', {hardLap}, {hardCore}, '{softOS}', {softVirt}, {iddepartment})"
+    for id in range(1, 1000):
         hardLap = randint(1,2) == 1
         if(hardLap):
             hostname = "LAPTOP-"
@@ -48,7 +48,7 @@ def fillHosts():
         softOS = random.choice(OS_list)
         softVirt = randint(1,2) == 1
         insertCommand += hostSkeleton.format(idhost=id, hostname=hostname, hardLap=hardLap, 
-            hardCore=hardCore, softOS=softOS, softVirt=softVirt)
+            hardCore=hardCore, softOS=softOS, softVirt=softVirt, iddepartment=randint(1,8))
         insertCommand += ",\n"
     insertCommand = insertCommand[:-2]
     print(insertCommand)
@@ -94,4 +94,35 @@ def fillVIT():
         with connection.cursor() as cursor:
             cursor.execute(insertCommand, (idVIT, severity, idVULN, timestamp, idHost))
             connection.commit()
-fillVIT()
+def fillDepartments():
+    return
+    for id in range(100, 110):
+        insertCommand = """
+                INSERT INTO departments(idVIT,severity,
+                idVULN, timestamp, idhost)
+                VALUES
+                (%s, %s, %s, %s, %s)
+                """
+        with connection.cursor() as cursor:
+            cursor.execute(insertCommand, (idVIT, severity,
+                           idVULN, timestamp, idHost))
+            connection.commit()
+def fillAlerts():
+    for id in range(1, 110):
+        insertCommand = """
+                INSERT INTO alerts(id,alert_time,
+                short_description, long_description, iddepartment,
+                priority, category, state, idhost)
+                VALUES
+                ("""
+        timestamp = "2022-"+str(randint(1, 12))+"-"+str(randint(1, 28))+" " + ":".join(
+            [str(randint(0, 23)), str(randint(0, 59)), str(randint(0, 59))])
+        insertCommand = insertCommand + ",".join([str(id), "'"+str(timestamp)+"'",
+                                                  "'Network intrusion'", "'Long Desc'", str(
+                                                      randint(1, 8)),
+                                                  str(randint(1, 5)), "'network'", "'unassigned'", str(randint(1, 1000))]) + ")"
+        print(insertCommand)
+        with connection.cursor() as cursor:
+            cursor.execute(insertCommand)
+            connection.commit()
+fillAlerts()
