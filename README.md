@@ -12,6 +12,7 @@ mySQL Workbench 8.*
 Following default settings, create a user 'root' with password 'root'. This can be changed, but keep in mind that the Database.py file must be updated to reflect the new credentials.
 
 # mySQL Workbench Install
+Again following default setting, add a mySQL server at 'localhost' with credentials user:root password:root. This is reliant on the previous section being set up as instructed.
 
 # Data Import
 After the mySQL server and workbench are installed, the sample data can be imported. Provided at /databaseDump/, the tables can be imported through mySQL workbench (provided it is already connected to the mySQL Server). Under Server->Data Import, you will select the .sql files from the previously mentioned directory, and the data will then be populated.
