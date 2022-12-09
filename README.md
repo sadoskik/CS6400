@@ -1,15 +1,20 @@
 # CS6400
 CS6400 DB Class Project. SIEM Mock Software
 
-# Frontend
-tkinter renders the GUI for this application. Main window displays the table of relevent records. The entirety of the application runs under Python with data requests being launched to the mySQL backend with SQL statements
+# REQUIREMENTS:
+Python 3.* (Any Python 3)
+tkinter library (pip install tk)
+mysql-connector (pip install mysql-connector-python)
+mySQL Server 8.*
+mySQL Workbench 8.*
 
+# mySQL Server Install
+Following default settings, create a user 'root' with password 'root'. This can be changed, but keep in mind that the Database.py file must be updated to reflect the new credentials.
 
+# mySQL Workbench Install
 
-
-# Backend
-mySQL server hosts the tables/records and serves requests from the python application. 
-If no additional configuration is desired, installing a server locally with the user `root` and password `root` will automatically connect with the default application. An export of the sample data is provided under databaseDump/. More info can be found under 'Data Import'
+# Data Import
+After the mySQL server and workbench are installed, the sample data can be imported. Provided at /databaseDump/, the tables can be imported through mySQL workbench (provided it is already connected to the mySQL Server). Under Server->Data Import, you will select the .sql files from the previously mentioned directory, and the data will then be populated.
 
 # Use
 After installing the dependencies (tkinter, mysql connector), the application can be run simply with `python application.py`.
@@ -26,10 +31,15 @@ references a field in another table. This allows a user to pivot from one table 
 * Set Current Table
 Text box that allows a user to specify a table to switch to. 
 
-# Data Import
+# Frontend
+tkinter renders the GUI for this application. Main window displays the table of relevent records. The entirety of the application runs under Python with data requests being launched to the mySQL backend with SQL statements
 
 
-# REQUIREMENTS:
-Python 3.* (Any Python 3)
-tkinter library (pip install tk)
-mysql-connector (pip install mysql-connector-python)
+# Backend
+mySQL server hosts the tables/records and serves requests from the python application. 
+If no additional configuration is desired, installing a server locally with the user `root` and password `root` will automatically connect with the default application. An export of the sample data is provided under databaseDump/. More info can be found under 'Data Import'
+
+
+
+
+
