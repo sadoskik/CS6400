@@ -39,6 +39,12 @@ tkinter renders the GUI for this application. Main window displays the table of 
 mySQL server hosts the tables/records and serves requests from the python application. 
 If no additional configuration is desired, installing a server locally with the user `root` and password `root` will automatically connect with the default application. An export of the sample data is provided under databaseDump/. More info can be found under 'Data Import'
 
+# References
+I referenced this resource detailing how to make a tkinter GUI (https://www.python4networkengineers.com/posts/python-intermediate/create_a_tkinter_gui_with_sqlite_backend/). I modified it to only show GUI elements relevent to my use case, broadened the scope of the interface to view multiple tables, and expanded the item entry to a separate window.
+I wrote the following files:
+* application.py (heavily modified from tkinter guide)
+* Database.py (lightly modified from tkinter guide)
+* dbConnection.py (original work, creates sample data)
 
 
 
